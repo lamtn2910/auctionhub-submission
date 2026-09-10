@@ -1,0 +1,16 @@
+REFLECTION.md
+1.
+Insertion Sort: This algorithm is very efficient when handling direct data streams or as an optimal sub-algorithm for small arrays due to its extremely fast speed on data that is already nearly sorted.
+Bubble Sort: Although rarely used in large systems, this is an ideal pedagogical tool and is sometimes applied in computer graphics to detect microscopic discrepancies.
+Interchange Sort: This method is suitable for quickly writing rudimentary code to process extremely small arrays, where programming time is prioritized over computer performance.
+Quicksort: This is a core algorithm in many programming languages ​​and large databases due to its superior average speed and optimized design with caching.
+Selection Sort: This algorithm is very useful in embedded system programming due to its ability to minimize the number of permutations, saving power and protecting the lifespan of written memory.
+2.
+Runtime: 744ms
+3. None
+4.
++Generate C++ code using std::mt19937 to produce 100,000 random Bid structs and write them to a file -> Green
++What is the median-of-three in quicksort? -> Green
++Generate testcase -> Green
+5.
+The worst-case complexity of Quicksort using the Median-of-three pivot technique is still O(n^2) because it only randomly samples three elements. In theory, it is entirely possible to create a special input array such that the median of the first, middle, and last three elements at each recursive step always falls on the second-smallest or second-largest element in the array. When that happens, the array will be continuously split in an extremely unbalanced way, causing the depth of the recursive tree to be maximally skewed and pushing the total execution time of the algorithm back to the worst-case scenario of O(n^2).

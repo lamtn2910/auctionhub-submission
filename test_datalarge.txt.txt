@@ -1,0 +1,63 @@
+#include <iostream>
+#include <fstream>
+#include <random>
+#include <cstdint>
+#include <cstring>
+#include <string>
+
+// A fixed-size POD struct so it can be written directly to disk with
+// ofstream::write() without any serialization step.
+struct Bid {
+    uint32_t bidId;
+    uint32_t itemId;
+    uint32_t bidderId;
+    double   amount;      // bid amount in dollars
+    uint64_t timestamp;   // unix-style timestamp (seconds)
+    char     currency[4]; // e.g. "USD", null-terminated
+};
+
+int main() {
+    const std::size_t NUM_BIDS = 100000;
+    const char* OUTPUT_FILE = "bids.dat";
+
+    // Seed mt19937 with a non-deterministic seed from random_device.
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    // Distributions for each field.
+    std::uniform_int_distribution<uint32_t> itemIdDist(1, 5000);
+    std::uniform_int_distribution<uint32_t> bidderIdDist(1, 20000);
+    std::uniform_real_distribution<double> amountDist(1.0, 10000.0);
+    std::uniform_int_distribution<uint64_t> timestampDist(
+        1'700'000'000ULL, 1'760'000'000ULL); // arbitrary unix time range
+
+    static const char* currencies[] = {"USD", "EUR", "GBP", "JPY"};
+    std::uniform_int_distribution<int> currencyDist(0, 3);
+
+    std::ofstream out(OUTPUT_FILE, std::ios::binary);
+    if (!out) {
+        std::cerr << "Failed to open " << OUTPUT_FILE << " for writing.\n";
+        return 1;
+    }
+
+    for (std::size_t i = 0; i < NUM_BIDS; ++i) {
+        Bid bid{};
+        bid.bidId     = static_cast<uint32_t>(i + 1);
+        bid.itemId    = itemIdDist(gen);
+        bid.bidderId  = bidderIdDist(gen);
+        bid.amount    = amountDist(gen);
+        bid.timestamp = timestampDist(gen);
+
+        std::memset(bid.currency, 0, sizeof(bid.currency));
+        std::strncpy(bid.currency, currencies[currencyDist(gen)], sizeof(bid.currency) - 1);
+
+        out.write(reinterpret_cast<const char*>(&bid), sizeof(Bid));
+    }
+
+    out.close();
+
+    std::cout << "Wrote " << NUM_BIDS << " Bid records ("
+              << NUM_BIDS * sizeof(Bid) << " bytes) to " << OUTPUT_FILE << "\n";
+
+    return 0;
+}
