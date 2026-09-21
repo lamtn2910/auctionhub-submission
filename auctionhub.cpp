@@ -69,8 +69,8 @@ void interchangeSort(vector<Bid>& v, long long& swaps)
                 Bid tmp = v[i];
                 v[i] = v[j];
                 v[j] = tmp;
+                swaps++;
             }
-            swaps++;
         }
     }
     cout << swaps << endl;
